@@ -16,36 +16,27 @@ class MainViewModel : ViewModel() {
     private val getShopItemsUseCase: GetShopItems = GetShopItems(shopListRepositoryImpl)
     private val getShopItemByIdUseCase: GetShopItemById = GetShopItemById(shopListRepositoryImpl)
 
-    var shopListLiveData = MutableLiveData<List<ShopItem>>()
-    var shopItemLiveData = MutableLiveData<ShopItem>()
+    var shopListLiveData = getShopItemsUseCase.getShopItems()
 
-    fun getShopListItems() {
-        val list = getShopItemsUseCase.getShopItems()
-        shopListLiveData.value = list
-    }
 
     fun getShopItemById(id: Int) {
-        shopItemLiveData.value = getShopItemByIdUseCase.getShopItemById(id)
+        getShopItemByIdUseCase.getShopItemById(id)
     }
 
     fun addShopItem(shopItem: ShopItem) {
         addShopItemUseCase.addShopItem(shopItem)
-        getShopListItems()
     }
 
     fun updateShopItem(shopItem: ShopItem) {
         updateShopItemUseCase.updateShopItem(shopItem)
-        getShopListItems()
     }
 
     fun deleteShopItem(shopItem: ShopItem) {
         deleteShopItemUseCase.deleteShopItem(shopItem)
-        getShopListItems()
     }
 
     fun changeEnableState(shopItem: ShopItem) {
         val newItem = shopItem.copy(enabled = !shopItem.enabled)
         updateShopItemUseCase.updateShopItem(newItem)
-        getShopListItems()
     }
 }

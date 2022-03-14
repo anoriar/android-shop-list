@@ -20,6 +20,5 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.shopListLiveData.observe(this) {
             Log.d("TEST", it.toString())
         }
-        mainViewModel.getShopListItems()
     }
 }
