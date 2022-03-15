@@ -7,12 +7,12 @@ import com.example.shoplist.domain.repository.ShopListRepositoryInterface
 
 object ShopListRepositoryImpl : ShopListRepositoryInterface {
     private var shopListLiveData = MutableLiveData<List<ShopItem>>()
-    private var shopList = mutableListOf<ShopItem>()
+    private var shopList = sortedSetOf<ShopItem>({ o1, o2 -> o1.id.compareTo(o2.id) })
     private var autoincrementIndex: Int = 0
 
     init {
-        for (i in 1..10) {
-            shopList.add(ShopItem("Item $i", (1..10).random(), true))
+        for (i in 1..20) {
+            addShopItem(ShopItem("Item $i", (1..10).random(), true))
         }
         updateShopListLiveData()
     }
@@ -22,11 +22,13 @@ object ShopListRepositoryImpl : ShopListRepositoryInterface {
     }
 
     override fun getShopItemById(id: Int): ShopItem {
-        return  shopList.find { it.id == id } ?: throw RuntimeException("Element not found")
+        return shopList.find { it.id == id } ?: throw RuntimeException("Element not found")
     }
 
     override fun addShopItem(shopItem: ShopItem) {
-        shopItem.id = autoincrementIndex++
+        if (shopItem.id == ShopItem.UNDEFINED_INDEX) {
+            shopItem.id = autoincrementIndex++
+        }
         shopList.add(shopItem)
         updateShopListLiveData()
     }
@@ -34,7 +36,7 @@ object ShopListRepositoryImpl : ShopListRepositoryInterface {
     override fun updateShopItem(shopItem: ShopItem) {
         val oldShopItem = getShopItemById(shopItem.id)
         deleteShopItem(oldShopItem)
-        shopList.add(shopItem)
+        addShopItem(shopItem)
     }
 
     override fun deleteShopItem(shopItem: ShopItem) {
