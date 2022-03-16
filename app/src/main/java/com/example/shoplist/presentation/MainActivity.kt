@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         mainViewModel.shopListLiveData.observe(this) {
-            shopListAdapter.shopList = it.toMutableList()
+            shopListAdapter.submitList(it)
         }
     }
 
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                mainViewModel.deleteShopItem(shopListAdapter.shopList[viewHolder.adapterPosition])
+                mainViewModel.deleteShopItem(shopListAdapter.currentList[viewHolder.adapterPosition])
             }
 
         }

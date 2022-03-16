@@ -5,19 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoplist.R
 import com.example.shoplist.domain.ShopItem
 
-class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>(){
-
-    var viewHoldersCount = 0
-
-    var shopList = mutableListOf<ShopItem>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+class ShopListAdapter :
+    ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder>(ShopItemDiffCallback()) {
 
     var onShopItemLongClickListener: ((ShopItem) -> Unit)? = null
     var onShopItemClickListener: ((ShopItem) -> Unit)? = null
@@ -40,7 +34,6 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
 
-        Log.d("VIEW_HOLDER_COUNT", "view holders count: ${++viewHoldersCount}")
         val layoutResource = when (viewType) {
             ENABLED_VIEW_TYPE -> ENABLED_LAYOUT_RESOURCE
             DISABLED_VIEW_TYPE -> DISABLED_LAYOUT_RESOURCE
@@ -53,7 +46,7 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
     }
 
     override fun onBindViewHolder(holder: ShopItemViewHolder, position: Int) {
-        val shopItem: ShopItem = shopList[position]
+        val shopItem: ShopItem = getItem(position)
 
         holder.tvName.text = shopItem.name
         holder.tvCount.text = shopItem.count.toString()
@@ -73,12 +66,10 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
     }
 
     override fun getItemViewType(position: Int): Int {
-        val shopItem: ShopItem = shopList[position]
+        val shopItem: ShopItem = getItem(position)
         return when (shopItem.enabled) {
             true -> ENABLED_VIEW_TYPE
             else -> DISABLED_VIEW_TYPE
         }
     }
-
-    override fun getItemCount(): Int = shopList.size
 }
