@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoplist.R
 import com.example.shoplist.domain.ShopItem
-import com.example.shoplist.presentation.viewmodel.MainViewModel
 
 class MainActivity : AppCompatActivity() {
 
