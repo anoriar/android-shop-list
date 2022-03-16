@@ -8,13 +8,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoplist.R
 import com.example.shoplist.domain.ShopItem
-import java.lang.RuntimeException
 
-class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>() {
+class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>(){
 
     var viewHoldersCount = 0
 
-    var shopList = listOf<ShopItem>()
+    var shopList = mutableListOf<ShopItem>()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -62,15 +61,15 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
         holder.itemView.setOnLongClickListener {
 //            invoke - для того, чтобы лямбда функция могла быть null
 //            (возможность поставить оператор ?)
-//            а по скти это тоже самое, что и onShopItemLongClickListener.invoke(shopItem)
+//            а по сути это тоже самое, что и onShopItemLongClickListener.invoke(shopItem)
             onShopItemLongClickListener?.invoke(shopItem)
             true
         }
 
         holder.itemView.setOnClickListener {
             onShopItemClickListener?.invoke(shopItem)
-            true
         }
+
     }
 
     override fun getItemViewType(position: Int): Int {
