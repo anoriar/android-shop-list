@@ -20,6 +20,9 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
             notifyDataSetChanged()
         }
 
+    var onShopItemLongClickListener: ((ShopItem) -> Unit)? = null
+    var onShopItemClickListener: ((ShopItem) -> Unit)? = null
+
     companion object {
         const val ENABLED_LAYOUT_RESOURCE = R.layout.item_shop_enabled
         const val DISABLED_LAYOUT_RESOURCE = R.layout.item_shop_disabled
@@ -55,6 +58,19 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
 
         holder.tvName.text = shopItem.name
         holder.tvCount.text = shopItem.count.toString()
+
+        holder.itemView.setOnLongClickListener {
+//            invoke - для того, чтобы лямбда функция могла быть null
+//            (возможность поставить оператор ?)
+//            а по скти это тоже самое, что и onShopItemLongClickListener.invoke(shopItem)
+            onShopItemLongClickListener?.invoke(shopItem)
+            true
+        }
+
+        holder.itemView.setOnClickListener {
+            onShopItemClickListener?.invoke(shopItem)
+            true
+        }
     }
 
     override fun getItemViewType(position: Int): Int {

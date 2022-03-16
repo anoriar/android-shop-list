@@ -40,5 +40,14 @@ class MainActivity : AppCompatActivity() {
             ShopListAdapter.DISABLED_VIEW_TYPE,
             ShopListAdapter.MAX_POOL_SIZE
         )
+
+        shopListAdapter.onShopItemLongClickListener = {
+            mainViewModel.changeEnableState(shopItem = it)
+        }
+        shopListAdapter.onShopItemClickListener = {
+            val shopItemInfo: ShopItem = mainViewModel.getShopItemById(it.id)
+            Log.d("SHOP_ITEM_INFO", shopItemInfo.toString())
+
+        }
     }
 }

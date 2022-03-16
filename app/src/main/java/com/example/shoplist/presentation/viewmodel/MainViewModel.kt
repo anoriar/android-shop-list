@@ -19,8 +19,8 @@ class MainViewModel : ViewModel() {
     var shopListLiveData = getShopItemsUseCase.getShopItems()
 
 
-    fun getShopItemById(id: Int) {
-        getShopItemByIdUseCase.getShopItemById(id)
+    fun getShopItemById(id: Int): ShopItem {
+        return getShopItemByIdUseCase.getShopItemById(id)
     }
 
     fun addShopItem(shopItem: ShopItem) {
