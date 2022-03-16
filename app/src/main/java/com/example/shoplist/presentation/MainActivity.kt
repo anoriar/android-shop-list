@@ -3,17 +3,20 @@ package com.example.shoplist.presentation
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoplist.R
 import com.example.shoplist.domain.ShopItem
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var shopListAdapter: ShopListAdapter
     private var itemTouchHelper: ItemTouchHelper? = null
+    private lateinit var addButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +26,15 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         mainViewModel.shopListLiveData.observe(this) {
             shopListAdapter.submitList(it)
+        }
+
+        initAddButton()
+    }
+
+    fun initAddButton() {
+        addButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
+        addButton.setOnClickListener {
+            startShopItemActivity()
         }
     }
 
@@ -39,12 +51,12 @@ class MainActivity : AppCompatActivity() {
             ShopListAdapter.MAX_POOL_SIZE
         )
 
-        setupLongClickListener()
-        setupClickListener()
-        setupSwipeListener(recyclerView)
+        setupOnLongClickListener()
+        setupOnClickListener()
+        setupOnSwipeListener(recyclerView)
     }
 
-    private fun setupSwipeListener(recyclerView: RecyclerView) {
+    private fun setupOnSwipeListener(recyclerView: RecyclerView) {
         val callback: ItemTouchHelper.SimpleCallback = object : ItemTouchHelper.SimpleCallback(
             0,
             ItemTouchHelper.START or ItemTouchHelper.END
@@ -66,16 +78,21 @@ class MainActivity : AppCompatActivity() {
         itemTouchHelper?.attachToRecyclerView(recyclerView)
     }
 
-    private fun setupClickListener() {
+    private fun setupOnClickListener() {
         shopListAdapter.onShopItemClickListener = {
-            val shopItemInfo: ShopItem = mainViewModel.getShopItemById(it.id)
-            Log.d("SHOP_ITEM_INFO", shopItemInfo.toString())
+            startShopItemActivity(it.id)
         }
     }
 
-    private fun setupLongClickListener() {
+    private fun setupOnLongClickListener() {
         shopListAdapter.onShopItemLongClickListener = {
             mainViewModel.changeEnableState(shopItem = it)
         }
+    }
+
+    private fun startShopItemActivity(id: Int? = null) {
+        val intent =
+            ShopItemActivity.getIntent(applicationContext, id)
+        startActivity(intent)
     }
 }
