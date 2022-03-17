@@ -17,30 +17,44 @@ class ShopItemViewModel : ViewModel() {
     private val addShopItemUseCase: AddShopItem = AddShopItem(shopListRepository)
     private val getShopItemByIdUseCase: GetShopItemById = GetShopItemById(shopListRepository)
 
-    private val _errorInputName = MutableLiveData<Boolean>()
+    private val _errorInputName = MutableLiveData<Boolean>(false)
+    private val _errorInputCount = MutableLiveData<Boolean>(false)
     val errorInputName: LiveData<Boolean>
         get() = _errorInputName
 
-    fun getShopItemById(id: Int): ShopItem {
-        return getShopItemByIdUseCase.getShopItemById(id)
+    val errorInputCount: LiveData<Boolean>
+        get() = _errorInputCount
+
+    private val _shopItem: MutableLiveData<ShopItem> = MutableLiveData<ShopItem>()
+    val shopItem: LiveData<ShopItem>
+        get() = _shopItem
+
+    fun getShopItemById(id: Int) {
+        _shopItem.value = getShopItemByIdUseCase.getShopItemById(id)
     }
+
+    private val _shouldClose: MutableLiveData<Unit> = MutableLiveData<Unit>()
+    val shouldClose: LiveData<Unit>
+        get() = _shouldClose
 
     fun addShopItem(inputName: String?, inputCount: String?) {
         val name = parseName(inputName)
         val count = parseCount(inputCount)
         if (validateInput(name, count)) {
             addShopItemUseCase.addShopItem(ShopItem(name, count, true))
+            finishWork()
         }
     }
 
-    fun updateShopItem(id: Int, inputName: String?, inputCount: String?) {
+    fun updateShopItem(inputName: String?, inputCount: String?) {
         val name = parseName(inputName)
         val count = parseCount(inputCount)
-        val shopItem = getShopItemById(id)
         if (validateInput(name, count)) {
-            shopItem.name = name
-            shopItem.count = count
-            updateShopItemUseCase.updateShopItem(shopItem)
+            _shopItem.value?.let {
+                val item = it.copy(name = name, count = count)
+                updateShopItemUseCase.updateShopItem(item)
+                finishWork()
+            }
         }
     }
 
@@ -63,8 +77,8 @@ class ShopItemViewModel : ViewModel() {
             result = false
         }
         if (count <= 0) {
-            _errorInputName.value = true
-            result = true
+            _errorInputCount.value = true
+            result = false
         }
 
         return result
@@ -72,5 +86,13 @@ class ShopItemViewModel : ViewModel() {
 
     fun resetErrorInputName() {
         _errorInputName.value = false
+    }
+
+    fun resetErrorCountName() {
+        _errorInputCount.value = false
+    }
+
+    fun finishWork() {
+        _shouldClose.value = Unit
     }
 }

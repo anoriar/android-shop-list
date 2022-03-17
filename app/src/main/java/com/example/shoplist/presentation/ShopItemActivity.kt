@@ -6,18 +6,18 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.widget.Button
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.shoplist.R
-import com.example.shoplist.domain.ShopItem
 import com.google.android.material.textfield.TextInputEditText
 
 class ShopItemActivity : AppCompatActivity() {
 
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var shopItemViewModel: ShopItemViewModel
     private lateinit var tietName: TextInputEditText
     private lateinit var tietCount: TextInputEditText
     private lateinit var btnSave: Button
-    private var shopItem: ShopItem? = null
+    private var mode: String = ADD_MODE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,13 +26,29 @@ class ShopItemActivity : AppCompatActivity() {
         tietName = findViewById(R.id.tietName)
         tietCount = findViewById(R.id.tietCount)
 
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        mode = intent.getStringExtra(SCREEN_MODE_EXTRA) ?: ADD_MODE
 
+        shopItemViewModel = ViewModelProvider(this).get(ShopItemViewModel::class.java)
+        shopItemViewModel.shopItem.observe(this) {
+            if (mode == EDIT_MODE) {
+                tietName.text = Editable.Factory.getInstance().newEditable(it.name)
+                tietCount.text = Editable.Factory.getInstance().newEditable(it.count.toString())
+            }
+        }
 
-        if (intent.hasExtra(SHOP_ITEM_ID_EXTRA)) {
-            val shopItem = mainViewModel.getShopItemById(intent.getIntExtra(SHOP_ITEM_ID_EXTRA, -1))
-            tietName.text = Editable.Factory.getInstance().newEditable(shopItem.name)
-            tietCount.text = Editable.Factory.getInstance().newEditable(shopItem.count.toString())
+        shopItemViewModel.errorInputName.observe(this) {
+            if (it) {
+                Toast.makeText(applicationContext, "Имя введено неверно", Toast.LENGTH_SHORT).show()
+            }
+        }
+        shopItemViewModel.errorInputCount.observe(this) {
+            if (it) {
+                Toast.makeText(applicationContext, "Количество введено неверно", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+        shopItemViewModel.shouldClose.observe(this) {
+            finish()
         }
 
         initSaveBtn()
@@ -41,34 +57,40 @@ class ShopItemActivity : AppCompatActivity() {
     private fun initSaveBtn() {
         btnSave = findViewById(R.id.btnEditSave)
         btnSave.setOnClickListener {
-            addUpdateShopItem()
-        }
-    }
-
-    private fun addUpdateShopItem() {
-
-        val name: String = tietName.text.toString()
-        val count: Int = tietName.text.toString().toInt()
-        if (shopItem == null) {
-            mainViewModel.addShopItem(ShopItem(name, count, true))
-        } else {
-            shopItem?.let {
-                it.name = name
-                it.count = count
-                mainViewModel.updateShopItem(it)
+            when (mode) {
+                ADD_MODE -> shopItemViewModel.addShopItem(
+                    tietName.text.toString(),
+                    tietCount.text.toString()
+                )
+                EDIT_MODE -> shopItemViewModel.updateShopItem(
+                    tietName.text.toString(),
+                    tietCount.text.toString()
+                )
             }
         }
-
     }
 
     companion object {
-        private const val SHOP_ITEM_ID_EXTRA = "SHOP_ITEM_ID_EXTRA"
-        fun getIntent(
+        private const val SHOP_ITEM_ID_EXTRA = "shop_item_id_extra"
+        private const val SCREEN_MODE_EXTRA = "screen_mode_extra"
+        private const val EDIT_MODE = "edit_mode"
+        private const val ADD_MODE = "add_mode"
+
+        fun getAddItemIntent(
+            context: Context
+        ): Intent {
+            return Intent(context, ShopItemActivity::class.java).apply {
+                putExtra(SCREEN_MODE_EXTRA, ADD_MODE)
+            }
+        }
+
+        fun getEditItemIntent(
             context: Context,
-            shopItemId: Int? = null
+            shopItemId: Int
         ): Intent {
             val intent = Intent(context, ShopItemActivity::class.java).apply {
                 putExtra(SHOP_ITEM_ID_EXTRA, shopItemId)
+                putExtra(SCREEN_MODE_EXTRA, EDIT_MODE)
             }
             return intent
         }
