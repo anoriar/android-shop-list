@@ -9,7 +9,9 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.shoplist.R
+import com.example.shoplist.domain.ShopItem
 import com.google.android.material.textfield.TextInputEditText
+import java.lang.RuntimeException
 
 class ShopItemActivity : AppCompatActivity() {
 
@@ -17,22 +19,30 @@ class ShopItemActivity : AppCompatActivity() {
     private lateinit var tietName: TextInputEditText
     private lateinit var tietCount: TextInputEditText
     private lateinit var btnSave: Button
-    private var mode: String = ADD_MODE
+    private var mode: String = MODE_UNKNOWN
+    private lateinit var onSaveCallback: ((name: String, count: String) -> Unit)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item)
-
-        tietName = findViewById(R.id.tietName)
-        tietCount = findViewById(R.id.tietCount)
-
-        mode = intent.getStringExtra(SCREEN_MODE_EXTRA) ?: ADD_MODE
-        val shopItemId: String? = intent.getStringExtra(SHOP_ITEM_ID_EXTRA)
-        if (mode == EDIT_MODE && shopItemId != null) {
-            shopItemViewModel.getShopItemById(shopItemId.toInt())
-        }
-
+        initViews()
+        parseIntent()
         shopItemViewModel = ViewModelProvider(this).get(ShopItemViewModel::class.java)
+        launchRightMode()
+        observeViewModel()
+    }
+
+    private fun launchRightMode() {
+        mode = intent.getStringExtra(SCREEN_MODE_EXTRA) ?: MODE_UNKNOWN
+        when (mode) {
+            EDIT_MODE ->
+                launchEditMode()
+            ADD_MODE ->
+                launchAddMode()
+        }
+    }
+
+    private fun observeViewModel() {
         shopItemViewModel.shopItem.observe(this) {
             tietName.text = Editable.Factory.getInstance().newEditable(it.name)
             tietCount.text = Editable.Factory.getInstance().newEditable(it.count.toString())
@@ -52,31 +62,57 @@ class ShopItemActivity : AppCompatActivity() {
         shopItemViewModel.shouldClose.observe(this) {
             finish()
         }
+    }
 
+    private fun launchEditMode() {
+        val shopItemId: Int = intent.getIntExtra(SHOP_ITEM_ID_EXTRA, ShopItem.UNDEFINED_INDEX)
+        shopItemViewModel.getShopItemById(shopItemId)
+        onSaveCallback =
+            { name: String, count: String -> shopItemViewModel.updateShopItem(name, count) }
+    }
+
+    private fun launchAddMode() {
+        onSaveCallback =
+            { name: String, count: String -> shopItemViewModel.addShopItem(name, count) }
+    }
+
+    private fun initViews() {
+        tietName = findViewById(R.id.tietName)
+        tietCount = findViewById(R.id.tietCount)
         initSaveBtn()
     }
 
     private fun initSaveBtn() {
         btnSave = findViewById(R.id.btnEditSave)
         btnSave.setOnClickListener {
-            when (mode) {
-                ADD_MODE -> shopItemViewModel.addShopItem(
-                    tietName.text.toString(),
-                    tietCount.text.toString()
-                )
-                EDIT_MODE -> shopItemViewModel.updateShopItem(
-                    tietName.text.toString(),
-                    tietCount.text.toString()
-                )
+            onSaveCallback.invoke(tietName.text.toString(), tietCount.text.toString())
+        }
+    }
+
+    private fun parseIntent() {
+        if (!intent.hasExtra(SCREEN_MODE_EXTRA)) {
+            throw RuntimeException("Param screen mode not found")
+        }
+        val mode = intent.getStringExtra(SCREEN_MODE_EXTRA)
+
+        if (mode != EDIT_MODE && mode != ADD_MODE) {
+            throw RuntimeException("Unknown mode $mode")
+        }
+
+        if (mode == EDIT_MODE) {
+            if (!intent.hasExtra(SHOP_ITEM_ID_EXTRA)) {
+                throw RuntimeException("Param shop item id not found")
             }
         }
     }
+
 
     companion object {
         private const val SHOP_ITEM_ID_EXTRA = "shop_item_id_extra"
         private const val SCREEN_MODE_EXTRA = "screen_mode_extra"
         private const val EDIT_MODE = "edit_mode"
         private const val ADD_MODE = "add_mode"
+        private const val MODE_UNKNOWN = "unknown_mode"
 
         fun getAddItemIntent(
             context: Context
