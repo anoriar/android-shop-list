@@ -2,22 +2,24 @@ package com.example.shoplist.presentation
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
-import android.widget.Toast
+import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.shoplist.R
 import com.example.shoplist.domain.ShopItem
-import com.google.android.material.textfield.TextInputEditText
-import java.lang.RuntimeException
+import com.google.android.material.textfield.TextInputLayout
 
 class ShopItemActivity : AppCompatActivity() {
 
     private lateinit var shopItemViewModel: ShopItemViewModel
-    private lateinit var tietName: TextInputEditText
-    private lateinit var tietCount: TextInputEditText
+    private lateinit var tilName: TextInputLayout
+    private lateinit var tilCount: TextInputLayout
+    private lateinit var tietName: EditText
+    private lateinit var tietCount: EditText
     private lateinit var btnSave: Button
     private var mode: String = MODE_UNKNOWN
     private lateinit var onSaveCallback: ((name: String, count: String) -> Unit)
@@ -29,6 +31,7 @@ class ShopItemActivity : AppCompatActivity() {
         parseIntent()
         shopItemViewModel = ViewModelProvider(this).get(ShopItemViewModel::class.java)
         launchRightMode()
+        addTextChangeListeners()
         observeViewModel()
     }
 
@@ -49,19 +52,49 @@ class ShopItemActivity : AppCompatActivity() {
         }
 
         shopItemViewModel.errorInputName.observe(this) {
-            if (it) {
-                Toast.makeText(applicationContext, "Имя введено неверно", Toast.LENGTH_SHORT).show()
+            val message = if (it) {
+                getString(R.string.error_name)
+            } else {
+                null
             }
+            tilName.error = message
         }
         shopItemViewModel.errorInputCount.observe(this) {
-            if (it) {
-                Toast.makeText(applicationContext, "Количество введено неверно", Toast.LENGTH_SHORT)
-                    .show()
+            val message = if (it) {
+                getString(R.string.error_count)
+            } else {
+                null
             }
+            tilCount.error = message
         }
         shopItemViewModel.shouldClose.observe(this) {
             finish()
         }
+    }
+
+    private fun addTextChangeListeners() {
+        tietName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                shopItemViewModel.resetErrorInputName()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        })
+        tietCount.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                shopItemViewModel.resetErrorCount()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        })
     }
 
     private fun launchEditMode() {
@@ -77,6 +110,8 @@ class ShopItemActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
+        tilName = findViewById(R.id.tilName)
+        tilCount = findViewById(R.id.tilCount)
         tietName = findViewById(R.id.tietName)
         tietCount = findViewById(R.id.tietCount)
         initSaveBtn()

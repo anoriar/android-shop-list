@@ -4,4 +4,6 @@
     <string name="save">Save</string>
     <string name="count">Count</string>
     <string name="name">Name</string>
+    <string name="error_name">Имя введено неверно</string>
+    <string name="error_count">Количество введено неверно</string>
 </resources>

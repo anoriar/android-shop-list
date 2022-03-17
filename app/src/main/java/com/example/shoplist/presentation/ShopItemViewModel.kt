@@ -88,7 +88,7 @@ class ShopItemViewModel : ViewModel() {
         _errorInputName.value = false
     }
 
-    fun resetErrorCountName() {
+    fun resetErrorCount() {
         _errorInputCount.value = false
     }
 
