@@ -27,13 +27,15 @@ class ShopItemActivity : AppCompatActivity() {
         tietCount = findViewById(R.id.tietCount)
 
         mode = intent.getStringExtra(SCREEN_MODE_EXTRA) ?: ADD_MODE
+        val shopItemId: String? = intent.getStringExtra(SHOP_ITEM_ID_EXTRA)
+        if (mode == EDIT_MODE && shopItemId != null) {
+            shopItemViewModel.getShopItemById(shopItemId.toInt())
+        }
 
         shopItemViewModel = ViewModelProvider(this).get(ShopItemViewModel::class.java)
         shopItemViewModel.shopItem.observe(this) {
-            if (mode == EDIT_MODE) {
-                tietName.text = Editable.Factory.getInstance().newEditable(it.name)
-                tietCount.text = Editable.Factory.getInstance().newEditable(it.count.toString())
-            }
+            tietName.text = Editable.Factory.getInstance().newEditable(it.name)
+            tietCount.text = Editable.Factory.getInstance().newEditable(it.count.toString())
         }
 
         shopItemViewModel.errorInputName.observe(this) {
