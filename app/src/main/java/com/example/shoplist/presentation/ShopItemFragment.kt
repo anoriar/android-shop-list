@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,7 @@ class ShopItemFragment : Fragment() {
     private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
     override fun onAttach(context: Context) {
+        Log.d("FRAGMENT_LIFECYCLE", "onAttach")
         super.onAttach(context)
         if (context is OnEditingFinishedListener) {
             onEditingFinishedListener = context
@@ -38,6 +40,7 @@ class ShopItemFragment : Fragment() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("FRAGMENT_LIFECYCLE", "onCreate")
         super.onCreate(savedInstanceState)
         parseParams()
     }
@@ -47,10 +50,12 @@ class ShopItemFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d("FRAGMENT_LIFECYCLE", "onCreateView")
         return inflater.inflate(R.layout.fragment_shop_item, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d("FRAGMENT_LIFECYCLE", "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
 
@@ -58,6 +63,41 @@ class ShopItemFragment : Fragment() {
         launchRightMode()
         addTextChangeListeners()
         observeViewModel()
+    }
+
+    override fun onStart() {
+        Log.d("FRAGMENT_LIFECYCLE", "onStart")
+        super.onStart()
+    }
+
+    override fun onResume() {
+        Log.d("FRAGMENT_LIFECYCLE", "onResume")
+        super.onResume()
+    }
+
+    override fun onPause() {
+        Log.d("FRAGMENT_LIFECYCLE", "onPause")
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Log.d("FRAGMENT_LIFECYCLE", "onStop")
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        Log.d("FRAGMENT_LIFECYCLE", "onDestroyView")
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        Log.d("FRAGMENT_LIFECYCLE", "onDestroy")
+        super.onDestroy()
+    }
+
+    override fun onDetach() {
+        Log.d("FRAGMENT_LIFECYCLE", "onDetach")
+        super.onDetach()
     }
 
     private fun launchRightMode() {
