@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.shoplist.R
 import com.example.shoplist.domain.ShopItem
 
-class ShopItemActivity : AppCompatActivity() {
+class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private var mode: String = MODE_UNKNOWN
     private var shopItemId: Int = ShopItem.UNDEFINED_INDEX
@@ -17,7 +17,7 @@ class ShopItemActivity : AppCompatActivity() {
         setContentView(R.layout.activity_shop_item)
         parseIntent()
 //        Запускаем  фрагмент только 1 раз при первом вызове активити
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             launchRightMode()
         }
     }
@@ -32,7 +32,8 @@ class ShopItemActivity : AppCompatActivity() {
         }
 
 //        Пересоздаем фрагмент с помощью replace а не add, чтобы не плодить фрагменты
-        supportFragmentManager.beginTransaction().replace(R.id.shop_item_container, fragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.shop_item_container, fragment)
+            .commit()
     }
 
     private fun parseIntent() {
@@ -73,5 +74,9 @@ class ShopItemActivity : AppCompatActivity() {
             }
             return intent
         }
+    }
+
+    override fun onEditingFinished() {
+        finish()
     }
 }
