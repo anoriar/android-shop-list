@@ -33,8 +33,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun launchFragment(fragment: ShopItemFragment) {
+//        Всегда, когда хотим создать фрагмент - выкидываем из бекстека последний.
+//        Чтобы при нажатии на кнопку назад всегда скрывать панель редактирования/добавления
+//        , даже если были нажаты несколько элементов списка подряд
+        supportFragmentManager.popBackStack()
         supportFragmentManager.beginTransaction()
-            .add(R.id.shop_item_container, fragment)
+            .replace(R.id.shop_item_container, fragment)
 //                Добавляем в бекстек фрагмент, как активити
             .addToBackStack(null)
             .commit()

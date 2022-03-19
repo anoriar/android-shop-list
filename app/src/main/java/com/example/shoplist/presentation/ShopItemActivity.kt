@@ -16,7 +16,10 @@ class ShopItemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item)
         parseIntent()
-        launchRightMode()
+//        Запускаем  фрагмент только 1 раз при первом вызове активити
+        if(savedInstanceState == null){
+            launchRightMode()
+        }
     }
 
     private fun launchRightMode() {
@@ -28,7 +31,8 @@ class ShopItemActivity : AppCompatActivity() {
             else -> throw RuntimeException("Unknown mode $mode")
         }
 
-        supportFragmentManager.beginTransaction().add(R.id.shop_item_container, fragment).commit()
+//        Пересоздаем фрагмент с помощью replace а не add, чтобы не плодить фрагменты
+        supportFragmentManager.beginTransaction().replace(R.id.shop_item_container, fragment).commit()
     }
 
     private fun parseIntent() {
