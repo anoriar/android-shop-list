@@ -5,7 +5,7 @@ import com.example.shoplist.domain.repository.ShopListRepositoryInterface
 
 class AddShopItem(private val shopListRepositoryInterface: ShopListRepositoryInterface) {
 
-    fun addShopItem(shopItem: ShopItem) {
+    suspend fun addShopItem(shopItem: ShopItem) {
         shopListRepositoryInterface.addShopItem(shopItem)
     }
 }

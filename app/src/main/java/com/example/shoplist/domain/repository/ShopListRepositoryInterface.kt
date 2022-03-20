@@ -5,8 +5,8 @@ import com.example.shoplist.domain.ShopItem
 
 interface ShopListRepositoryInterface {
     fun getShopListItems(): LiveData<List<ShopItem>>
-    fun getShopItemById(id: Int): ShopItem
-    fun addShopItem(shopItem: ShopItem)
-    fun updateShopItem(shopItem: ShopItem)
-    fun deleteShopItem(shopItem: ShopItem)
+    suspend fun getShopItemById(id: Int): ShopItem
+    suspend fun addShopItem(shopItem: ShopItem)
+    suspend fun updateShopItem(shopItem: ShopItem)
+    suspend fun deleteShopItem(shopItem: ShopItem)
 }

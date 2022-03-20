@@ -8,6 +8,6 @@ data class ShopItem(
 ) {
 
     companion object {
-        const val UNDEFINED_INDEX = -1
+        const val UNDEFINED_INDEX = 0
     }
 }

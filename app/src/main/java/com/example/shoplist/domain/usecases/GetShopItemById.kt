@@ -4,7 +4,7 @@ import com.example.shoplist.domain.ShopItem
 import com.example.shoplist.domain.repository.ShopListRepositoryInterface
 
 class GetShopItemById(private val shopListRepositoryInterface: ShopListRepositoryInterface) {
-    fun getShopItemById(id: Int): ShopItem {
+    suspend fun getShopItemById(id: Int): ShopItem {
         return shopListRepositoryInterface.getShopItemById(id)
     }
 }
