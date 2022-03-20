@@ -1,7 +1,8 @@
-package com.example.shoplist.data.repository
+package com.example.shoplist.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.example.shoplist.domain.ShopItem
 
 @Dao
 interface ShopListDao {
@@ -10,11 +11,11 @@ interface ShopListDao {
     fun getShopItems(): LiveData<List<ShopItemDbModel>>
 
     @Query("SELECT * FROM shop_items WHERE id = :id LIMIT 1")
-    fun getShopItemById(id: Int): LiveData<ShopItemDbModel>
+    fun getShopItemById(id: Int): ShopItemDbModel
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addShopItem()
+    fun addShopItem(shopItem: ShopItemDbModel)
 
     @Delete
-    fun deleteShopItem()
+    fun deleteShopItem(shopItem: ShopItemDbModel)
 }
