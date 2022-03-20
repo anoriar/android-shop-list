@@ -5,7 +5,7 @@ import com.example.shoplist.domain.repository.ShopListRepositoryInterface
 
 class DeleteShopItem(private val shopListRepositoryInterface: ShopListRepositoryInterface) {
 
-    fun deleteShopItem(shopItem: ShopItem) {
+    suspend fun deleteShopItem(shopItem: ShopItem) {
         shopListRepositoryInterface.deleteShopItem(shopItem)
     }
 }
