@@ -2,6 +2,7 @@ package com.example.shoplist.data
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.example.shoplist.domain.ShopItem
 import com.example.shoplist.domain.repository.ShopListRepositoryInterface
 
@@ -9,15 +10,10 @@ class ShopListRepositoryImpl(application: Application) : ShopListRepositoryInter
     private val shopListMapper: ShopListMapper = ShopListMapper()
     private val shopListDao: ShopListDao = AppDatabase.getInstance(application).shopListDao()
 
-//    init {
-//        for (i in 1..20) {
-//            addShopItem(ShopItem("Item $i", (1..10).random(), true))
-//        }
-//        updateShopListLiveData()
-//    }
-
     override fun getShopListItems(): LiveData<List<ShopItem>> {
-        return shopListMapper.mapListDbModelToListEntity(shopListDao.getShopItems())
+        return Transformations.map(shopListDao.getShopItems()) {
+            shopListMapper.mapListDbModelToListEntity(it)
+        }
     }
 
     override fun getShopItemById(id: Int): ShopItem {
